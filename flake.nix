@@ -25,7 +25,15 @@
       };
 
       # Strauss: Macbook
-      # TODO
+      homeConfigurations."user@Strauss" = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.aarch64-linux;
+        extraSpecialArgs = { inherit inputs; };
+        modules = [
+          ./home/common.nix
+          ./home/profiles/laptop.nix
+          ./hosts/Strauss.nix
+        ];
+      };
 
       # Mahler: CTF Laptop
       homeConfigurations."user@Mahler" = home-manager.lib.homeManagerConfiguration {
