@@ -8,13 +8,16 @@
 }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      inputs.home-manager.nixosModules.home-manager
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    inputs.home-manager.nixosModules.home-manager
+  ];
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
@@ -45,10 +48,9 @@
   # };
   #
   environment.systemPackages = map lib.lowPrio [
-      pkgs.curl
-      pkgs.gitMinimal
-    ];
-
+    pkgs.curl
+    pkgs.gitMinimal
+  ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.user = {
@@ -58,27 +60,25 @@
       tree
     ];
 
-    openssh.authorizedKeys.keys =
-      [
-        # change this to your ssh key
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFI7c7z8nSnxx98qhVosRNDYNRk1jnT3Xgqg50JpQfiJ paul@macbook"
-      ];
-  };
-
-
-
-  home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      users.user = import ../../home/nixos-common.nix { inherit pkgs config; nixosConfig = config; };
-    };
-
-
-  users.users.root.openssh.authorizedKeys.keys =
-    [
+    openssh.authorizedKeys.keys = [
       # change this to your ssh key
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFI7c7z8nSnxx98qhVosRNDYNRk1jnT3Xgqg50JpQfiJ paul@macbook"
     ];
+  };
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.user = import ../../home/nixos-common.nix {
+      inherit pkgs config;
+      nixosConfig = config;
+    };
+  };
+
+  users.users.root.openssh.authorizedKeys.keys = [
+    # change this to your ssh key
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFI7c7z8nSnxx98qhVosRNDYNRk1jnT3Xgqg50JpQfiJ paul@macbook"
+  ];
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
@@ -115,11 +115,51 @@
   sops.defaultSopsFile = ./secrets/example.yaml;
 
   sops.secrets."api-key" = {
-    owner = "user";  # or whatever your username is
+    owner = "user"; # or whatever your username is
   };
 
+  # Enable Docker
+  virtualisation.docker = {
+    enable = true;
+    autoPrune.enable = true;
+  };
 
+  # Kernel parameters wg-easy needs on the host
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
+    "net.ipv6.conf.all.forwarding" = 1;
+  };
 
+  # Declarative wg-easy container via the OCI module
+  virtualisation.oci-containers = {
+    backend = "docker";
+    containers.wg-easy = {
+      image = "ghcr.io/wg-easy/wg-easy:15";
+      autoStart = true;
+      ports = [
+        "51820:51820/udp"
+        # Bind UI to localhost only — put a reverse proxy in front of it.
+        "127.0.0.1:51821:51821/tcp"
+      ];
+      volumes = [
+        "/var/lib/wg-easy:/etc/wireguard"
+        "/lib/modules:/lib/modules:ro"
+      ];
+      environment = {
+        # Optional, helpful when the UI is behind a proxy without TLS termination
+        # INSECURE = "true";
+      };
+      extraOptions = [
+        "--cap-add=NET_ADMIN"
+        "--cap-add=SYS_MODULE"
+        "--sysctl=net.ipv4.ip_forward=1"
+        "--sysctl=net.ipv4.conf.all.src_valid_mark=1"
+        "--sysctl=net.ipv6.conf.all.disable_ipv6=0"
+        "--sysctl=net.ipv6.conf.all.forwarding=1"
+        "--sysctl=net.ipv6.conf.default.forwarding=1"
+      ];
+    };
+  };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.

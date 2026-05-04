@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -15,6 +15,9 @@
   home.packages = with pkgs; [
     btop
     gnumake
+    sops
+    git
+    age
   ];
 
 }
