@@ -5,23 +5,35 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixgl.url = "github:nix-community/nixGL";
+    nixgl = {
+      url = "github:nix-community/nixGL";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { nixpkgs, home-manager, ... }@inputs:
+    { nixpkgs, home-manager, sops-nix, ... }@inputs:
     {
 
       # Wagner: homelab
       nixosConfigurations.Wagner = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
         modules = [ ./nixos/Wagner/configuration.nix ];
       };
 
       # Bruckner: vps
-      nixosConfigurations.Brukner = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.Bruckner = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        modules = [ ./nixos/Brukner/configuration.nix ];
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/Bruckner/configuration.nix
+          sops-nix.nixosModules.sops
+        ];
       };
 
       # Strauss: Macbook
@@ -31,7 +43,7 @@
         modules = [
           ./home/common.nix
           ./home/profiles/laptop.nix
-          ./hosts/Strauss.nix
+          ./hosts/Strauss/home.nix
         ];
       };
 
@@ -42,7 +54,7 @@
         modules = [
           ./home/common.nix
           ./home/profiles/laptop.nix
-          ./hosts/Mahler.nix
+          ./hosts/Mahler/home.nix
         ];
       };
     };

@@ -1,0 +1,10 @@
+keys:
+  - &strauss age1yn39pts4aj9mcs6mgncw3cy409kdatamqaez2mgnh73vrqg98udq0slsnc
+  - &bruckner age1lrratr9lw0z7f5wlu8t8d6yepht3sxc8fy4y8xcq8pjzy6m273cq9r70m9
+# …more server keys go here…
+creation_rules:
+  - path_regex: hosts/Bruckner/secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *strauss
+          - *bruckner
