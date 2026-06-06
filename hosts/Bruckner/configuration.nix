@@ -103,6 +103,19 @@ in
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
+  services.nginx = {
+    enable = true;
+    virtualHosts."error-pages" = {
+      listen = [ { addr = "127.0.0.1"; port = 8404; } ];
+      extraConfig = ''
+        root ${pkgs.writeTextDir "404.html" (builtins.readFile ./www/404.html)};
+        error_page 404 /404.html;
+        location / { return 404; }
+        location = /404.html { internal; }
+      '';
+    };
+  };
+
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [ 22 80 443 ];
   networking.firewall.allowedUDPPorts = [ 51820 ];
@@ -126,6 +139,7 @@ in
         };
         websecure.address = ":443";
       };
+      api.dashboard = true;
       certificatesResolvers.letsencrypt.acme = {
         email = "paul@serviel.fr";
         storage = "/var/lib/traefik/acme.json";
@@ -135,7 +149,28 @@ in
         };
       };
     };
-    dynamicConfigOptions = {};
+    dynamicConfigOptions = {
+      http = {
+        routers.traefik-dashboard = {
+          rule = "Host(`traefik.pouic.cc`)";
+          entryPoints = [ "websecure" ];
+          service = "api@internal";
+          tls.certResolver = "letsencrypt";
+          middlewares = [ "vpn-only" ];
+        };
+        middlewares.vpn-only.ipAllowList.sourceRange = [ "10.0.0.0/24" ];
+        routers.default = {
+          rule = "PathPrefix(`/`)";
+          entryPoints = [ "websecure" ];
+          service = "default-404";
+          priority = 1;
+          tls = {};
+        };
+        services.default-404.loadBalancer.servers = [
+          { url = "http://127.0.0.1:8404"; }
+        ];
+      };
+    };
   };
 
   # Copy the NixOS configuration file and link it from the resulting system

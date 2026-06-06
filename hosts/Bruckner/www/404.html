@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>404 — Lost in Space</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1630;
+      --paper: #0f0c1e;
+      --purple-deep: #26215C;
+      --purple-mid: #534AB7;
+      --purple-light: #AFA9EC;
+      --purple-pale: #EEEDFE;
+      --amber: #FAC775;
+      --pink: #ED93B1;
+      --teal: #5DCAA5;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--paper);
+      color: var(--purple-pale);
+      font-family: 'DM Mono', monospace;
+      overflow: hidden;
+    }
+
+    /* ── star canvas ── */
+    #stars {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+
+    /* ── noise grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+    }
+
+    /* ── layout ── */
+    .page {
+      position: relative; z-index: 2;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      gap: 0;
+    }
+
+    /* ── big ghost 404 behind everything ── */
+    .ghost-404 {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -52%);
+      font-family: 'Fraunces', serif;
+      font-size: clamp(180px, 28vw, 340px);
+      font-weight: 700;
+      color: #534AB7;
+      opacity: 0.07;
+      letter-spacing: -0.04em;
+      user-select: none;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    /* ── mascot svg ── */
+    .mascot-wrap {
+      animation: float 3.2s ease-in-out infinite;
+      cursor: default;
+      filter: drop-shadow(0 24px 48px rgba(83,74,183,0.45));
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+
+    /* ── speech bubble ── */
+    .bubble {
+      position: relative;
+      background: var(--purple-deep);
+      border: 1.5px solid var(--purple-mid);
+      border-radius: 18px;
+      padding: 14px 22px;
+      max-width: 280px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--purple-pale);
+      margin-top: -12px;
+      animation: bubble-in 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.8s both;
+    }
+    .bubble::before {
+      content: '';
+      position: absolute;
+      top: -14px; left: 50%; transform: translateX(-50%);
+      border: 7px solid transparent;
+      border-bottom-color: var(--purple-mid);
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      top: -11px; left: 50%; transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-bottom-color: var(--purple-deep);
+    }
+    @keyframes bubble-in {
+      from { opacity:0; transform: scale(0.7) translateY(10px); }
+      to   { opacity:1; transform: scale(1) translateY(0); }
+    }
+
+    /* ── copy block ── */
+    .copy {
+      text-align: center;
+      margin-top: 2.5rem;
+      animation: fade-up 0.7s ease 0.4s both;
+    }
+    .copy h1 {
+      font-family: 'Fraunces', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      color: var(--purple-pale);
+      margin-bottom: 0.6rem;
+    }
+    .copy h1 em {
+      font-style: normal;
+      color: var(--amber);
+    }
+    .copy p {
+      font-size: 12px;
+      color: var(--purple-light);
+      opacity: 0.7;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── cta row ── */
+    .cta-row {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      margin-top: 2rem;
+      animation: fade-up 0.7s ease 0.6s both;
+    }
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      padding: 10px 24px;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 1.5px solid;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: var(--purple-mid);
+      border-color: var(--purple-mid);
+      color: var(--purple-pale);
+      box-shadow: 0 4px 20px rgba(83,74,183,0.4);
+    }
+    .btn-primary:hover { box-shadow: 0 8px 30px rgba(83,74,183,0.6); }
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--purple-mid);
+      color: var(--purple-light);
+    }
+    .btn-ghost:hover { background: rgba(83,74,183,0.15); }
+
+    /* ── error code ── */
+    .error-code {
+      margin-top: 2.5rem;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--purple-mid);
+      opacity: 0.5;
+      animation: fade-up 0.7s ease 0.9s both;
+    }
+
+    @keyframes fade-up {
+      from { opacity:0; transform: translateY(16px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ── SVG animations ── */
+    .pouic-float { animation: float 3.2s ease-in-out infinite; transform-origin: 200px 160px; }
+    .blink { animation: blink 4s ease-in-out infinite; }
+    @keyframes blink {
+      0%,90%,100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.06); }
+    }
+    .spin { animation: spin 14s linear infinite; transform-origin: 200px 160px; }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .arm-l { animation: arm-wave 2.4s ease-in-out infinite; transform-origin: 142px 168px; }
+    .arm-r { animation: arm-wave 2.4s ease-in-out infinite reverse; transform-origin: 258px 168px; }
+    @keyframes arm-wave {
+      0%,100% { transform: rotate(-6deg); }
+      50% { transform: rotate(6deg); }
+    }
+    .star-twinkle { animation: twinkle 2.8s ease-in-out infinite; }
+    @keyframes twinkle {
+      0%,100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* ── floating debris ── */
+    .debris { position: fixed; pointer-events: none; z-index: 1; }
+    .debris span {
+      position: absolute;
+      border-radius: 50%;
+      animation: drift linear infinite;
+    }
+    @keyframes drift {
+      from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 0.4; }
+      to   { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div class="debris" id="debris"></div>
+<div class="ghost-404">404</div>
+
+<main class="page">
+
+  <!-- Pouic SVG mascot -->
+  <div class="mascot-wrap">
+    <svg width="340" viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg" aria-label="Pouic, a confused alien mascot">
+
+      <!-- orbit ring -->
+      <g class="spin">
+        <ellipse cx="200" cy="175" rx="118" ry="30" fill="none" stroke="#AFA9EC" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.4"/>
+      </g>
+
+      <!-- tail/wisp -->
+      <path d="M152 255 Q135 305 150 328 Q162 345 168 328 Q174 348 182 328 Q188 346 196 328 Q202 344 210 328 Q216 344 222 328 Q228 345 238 328 Q244 306 228 255" fill="#534AB7"/>
+
+      <!-- body shadow -->
+      <ellipse cx="200" cy="300" rx="62" ry="11" fill="#26215C" opacity="0.3"/>
+
+      <!-- main body -->
+      <ellipse cx="200" cy="188" rx="80" ry="76" fill="#534AB7"/>
+
+      <!-- tummy sheen -->
+      <ellipse cx="200" cy="202" rx="44" ry="38" fill="#7F77DD" opacity="0.4"/>
+
+      <!-- left antenna -->
+      <line x1="168" y1="120" x2="145" y2="84" stroke="#AFA9EC" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="140" cy="76" r="10" fill="#FAC775"/>
+      <circle cx="140" cy="76" r="5" fill="#EF9F27"/>
+
+      <!-- right antenna -->
+      <line x1="232" y1="120" x2="255" y2="84" stroke="#AFA9EC" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="260" cy="76" r="10" fill="#F4C0D1"/>
+      <circle cx="260" cy="76" r="5" fill="#D4537E"/>
+
+      <!-- left arm -->
+      <g class="arm-l">
+        <path d="M132 175 Q110 162 103 178 Q96 194 114 196 Q125 197 132 186" fill="#534AB7" stroke="#7F77DD" stroke-width="1"/>
+      </g>
+
+      <!-- right arm -->
+      <g class="arm-r">
+        <path d="M268 175 Q290 162 297 178 Q304 194 286 196 Q275 197 268 186" fill="#534AB7" stroke="#7F77DD" stroke-width="1"/>
+      </g>
+
+      <!-- left eye -->
+      <ellipse cx="177" cy="178" rx="20" ry="20" fill="white"/>
+      <g class="blink" style="transform-origin:177px 178px">
+        <ellipse cx="177" cy="182" rx="12" ry="13" fill="#1a1630"/>
+        <circle cx="182" cy="176" r="4.5" fill="white" opacity="0.9"/>
+      </g>
+
+      <!-- right eye -->
+      <ellipse cx="223" cy="178" rx="20" ry="20" fill="white"/>
+      <g class="blink" style="transform-origin:223px 178px; animation-delay:0.1s">
+        <ellipse cx="223" cy="182" rx="12" ry="13" fill="#1a1630"/>
+        <circle cx="228" cy="176" r="4.5" fill="white" opacity="0.9"/>
+      </g>
+
+      <!-- brows (confused / furrowed) -->
+      <path d="M161 162 Q177 155 186 160" fill="none" stroke="#26215C" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M214 160 Q223 155 239 162" fill="none" stroke="#26215C" stroke-width="2.5" stroke-linecap="round"/>
+
+      <!-- mouth -->
+      <ellipse cx="200" cy="212" rx="11" ry="9" fill="#26215C"/>
+      <ellipse cx="200" cy="212" rx="7" ry="6" fill="#7F77DD"/>
+
+      <!-- blush -->
+      <ellipse cx="155" cy="200" rx="12" ry="7" fill="#ED93B1" opacity="0.4"/>
+      <ellipse cx="245" cy="200" rx="12" ry="7" fill="#ED93B1" opacity="0.4"/>
+
+      <!-- name tag -->
+      <rect x="168" y="298" width="64" height="24" rx="12" fill="#534AB7" stroke="#AFA9EC" stroke-width="1"/>
+      <text x="200" y="315" font-family="Georgia,serif" font-size="11" font-weight="700" fill="#EEEDFE" text-anchor="middle" letter-spacing="2">POUIC</text>
+
+      <!-- small stars near mascot -->
+      <g class="star-twinkle">
+        <polygon points="118,108 120,115 127,115 121,119 123,126 118,122 113,126 115,119 109,115 116,115" fill="#FAC775" opacity="0.8" transform="scale(0.7) translate(52,62)"/>
+      </g>
+      <g class="star-twinkle" style="animation-delay:1.2s">
+        <polygon points="288,95 290,102 297,102 291,106 293,113 288,109 283,113 285,106 279,102 286,102" fill="#F4C0D1" opacity="0.8" transform="scale(0.65) translate(157,55)"/>
+      </g>
+
+    </svg>
+  </div>
+
+  <!-- Speech bubble -->
+  <div class="bubble">
+    <strong style="color:var(--amber)">Hmm…</strong> I searched every galaxy<br>but couldn't find this page.
+  </div>
+
+  <!-- Copy -->
+  <div class="copy">
+    <h1>This page has <em>vanished</em><br>into the void.</h1>
+    <p>error 404 &nbsp;·&nbsp; page not found</p>
+  </div>
+
+  <!-- CTA buttons -->
+  <div class="cta-row">
+    <a href="/" class="btn btn-primary">← take me home</a>
+    <a href="javascript:history.back()" class="btn btn-ghost">go back</a>
+  </div>
+
+  <p class="error-code">HTTP_404 &nbsp;·&nbsp; RESOURCE_NOT_FOUND</p>
+
+</main>
+
+<script>
+  // ── star field ──
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    stars = Array.from({ length: 160 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      o: Math.random() * 0.7 + 0.2,
+      s: Math.random() * 0.4 + 0.1
+    }));
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  let t = 0;
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const pulse = s.o + Math.sin(t * s.s + s.x) * 0.2;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(175,169,236,${Math.max(0.1, Math.min(1, pulse))})`;
+      ctx.fill();
+    });
+    t += 0.015;
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  // ── floating debris particles ──
+  const debris = document.getElementById('debris');
+  const colors = ['#AFA9EC','#FAC775','#ED93B1','#5DCAA5'];
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('span');
+    const size = Math.random() * 4 + 2;
+    const left = Math.random() * 100;
+    const dur = Math.random() * 20 + 14;
+    const delay = -Math.random() * dur;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    s.style.cssText = `width:${size}px;height:${size}px;left:${left}vw;background:${color};opacity:0.5;animation-duration:${dur}s;animation-delay:${delay}s;`;
+    debris.appendChild(s);
+  }
+
+  // ── easter egg: click Pouic ──
+  const mascot = document.querySelector('.mascot-wrap');
+  const messages = [
+    "Hey! That tickles! 👾",
+    "I'm Pouic, not a button… well, maybe I am.",
+    "Still can't find the page, sorry!",
+    "Wheee! 🌀",
+    "Error 404: patience not found.",
+  ];
+  let idx = 0;
+  const bubble = document.querySelector('.bubble');
+  mascot.addEventListener('click', () => {
+    bubble.textContent = messages[idx++ % messages.length];
+    mascot.style.animation = 'none';
+    setTimeout(() => mascot.style.animation = '', 50);
+  });
+</script>
+</body>
+</html>
