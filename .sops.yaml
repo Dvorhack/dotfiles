@@ -8,3 +8,7 @@ creation_rules:
       - age:
           - *strauss
           - *bruckner
+  - path: wireguard/keys.yaml
+    key_groups:
+      - age:
+          - *strauss

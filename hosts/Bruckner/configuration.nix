@@ -7,6 +7,9 @@
   ...
 }:
 
+let
+  wg = import ../../wireguard/peers.nix;
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -101,10 +104,39 @@
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.allowedTCPPorts = [ 22 80 443 ];
+  networking.firewall.allowedUDPPorts = [ 51820 ];
+
+  sops.secrets."traefik-ovh-env" = {
+    sopsFile = ./secrets/traefik.yaml;
+    restartUnits = [ "traefik.service" ];
+  };
+
+  services.traefik = {
+    enable = true;
+    environmentFiles = [ config.sops.secrets."traefik-ovh-env".path ];
+    staticConfigOptions = {
+      entryPoints = {
+        web = {
+          address = ":80";
+          http.redirections.entryPoint = {
+            to = "websecure";
+            scheme = "https";
+          };
+        };
+        websecure.address = ":443";
+      };
+      certificatesResolvers.letsencrypt.acme = {
+        email = "paul@serviel.fr";
+        storage = "/var/lib/traefik/acme.json";
+        dnsChallenge = {
+          provider = "ovh";
+          resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
+        };
+      };
+    };
+    dynamicConfigOptions = {};
+  };
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
@@ -124,41 +156,31 @@
     autoPrune.enable = true;
   };
 
-  # Kernel parameters wg-easy needs on the host
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
     "net.ipv6.conf.all.forwarding" = 1;
   };
 
-  # Declarative wg-easy container via the OCI module
-  virtualisation.oci-containers = {
-    backend = "docker";
-    containers.wg-easy = {
-      image = "ghcr.io/wg-easy/wg-easy:15";
-      autoStart = true;
-      ports = [
-        "51820:51820/udp"
-        # Bind UI to localhost only — put a reverse proxy in front of it.
-        "127.0.0.1:51821:51821/tcp"
-      ];
-      volumes = [
-        "/var/lib/wg-easy:/etc/wireguard"
-        "/lib/modules:/lib/modules:ro"
-      ];
-      environment = {
-        # Optional, helpful when the UI is behind a proxy without TLS termination
-        # INSECURE = "true";
-      };
-      extraOptions = [
-        "--cap-add=NET_ADMIN"
-        "--cap-add=SYS_MODULE"
-        "--sysctl=net.ipv4.ip_forward=1"
-        "--sysctl=net.ipv4.conf.all.src_valid_mark=1"
-        "--sysctl=net.ipv6.conf.all.disable_ipv6=0"
-        "--sysctl=net.ipv6.conf.all.forwarding=1"
-        "--sysctl=net.ipv6.conf.default.forwarding=1"
-      ];
-    };
+  networking.nftables.enable = true;
+  networking.nat = {
+    enable = true;
+    enableIPv6 = true;
+    externalInterface = "ens18";
+    internalInterfaces = [ "wg0" ];
+  };
+
+  sops.secrets."wireguard-private-key" = {
+    sopsFile = ./secrets/wireguard.yaml;
+  };
+
+  networking.wireguard.interfaces.wg0 = {
+    ips = [ "${wg.servers.bruckner.ip}/24" ];
+    listenPort = 51820;
+    privateKeyFile = config.sops.secrets."wireguard-private-key".path;
+    peers = lib.mapAttrsToList (_name: peer: {
+      publicKey = peer.publicKey;
+      allowedIPs = [ "${peer.ip}/32" ];
+    }) wg.peers;
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,

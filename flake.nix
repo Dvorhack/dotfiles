@@ -55,6 +55,7 @@
           ./home/common.nix
           ./home/profiles/laptop.nix
           ./hosts/Mahler/home.nix
+          inputs.sops-nix.homeManagerModules.sops
         ];
       };
     };
