@@ -45,6 +45,10 @@
       ip = "10.0.0.4";
       publicKey = "oAtfvvLFEzymC1Z0AgkY/4OZUxvn0/+I+VriQOf6oh0=";
     };
+    torrent = {
+      ip = "10.0.0.5";
+      publicKey = "yOk3A0YPwfMWTQThnSLmJrg3uwDq9Falz4Pb+uK6PAk=";
+    };
 
   };
 }

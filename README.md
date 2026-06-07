@@ -24,8 +24,8 @@ sudo semanage fcontext -a -t shell_exec_t '/nix/store/.*/bin/zsh'
 
 full commands
 ```bash
-NAME="strauss-full"
-IP="10.0.0.4"
+NAME="torrent"
+IP="10.0.0.5"
 ALLOWED="0.0.0.0/0, ::/0"   # lan: 10.0.0.0/24  full: 0.0.0.0/0, ::/0
 ENDPOINT="pouic.cc:51820"
 SERVER_PUBKEY="6mdG3H+qsQEX0LGgeKDkZDlcIHeQF+ZYijethWDEWnc="
