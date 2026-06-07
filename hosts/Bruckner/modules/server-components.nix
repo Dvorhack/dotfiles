@@ -27,6 +27,9 @@
         composeFile = ./docker/miniflux/compose.yaml;
         sopsSecretFile = ./docker/miniflux/secrets.enc.env;
       };
+      ntfy = {
+        composeFile = ./docker/ntfy/compose.yaml;
+      };
       # beszel-agent = {
       #   overrideCompose = ./docker/beszel-agent/prod.yaml;
       #   composeFile = ../../../docker/beszel/agent.yaml;
