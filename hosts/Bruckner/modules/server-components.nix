@@ -23,6 +23,10 @@
       webhook = {
         composeFile = ./docker/webhook/compose.yaml;
       };
+      miniflux = {
+        composeFile = ./docker/miniflux/compose.yaml;
+        sopsSecretFile = ./docker/miniflux/secrets.enc.env;
+      };
       # beszel-agent = {
       #   overrideCompose = ./docker/beszel-agent/prod.yaml;
       #   composeFile = ../../../docker/beszel/agent.yaml;

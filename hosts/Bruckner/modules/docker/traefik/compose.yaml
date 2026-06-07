@@ -41,6 +41,7 @@ services:
       - "traefik.http.middlewares.vpn-only.ipallowlist.sourcerange=10.0.0.0/24"
 
     environment:
+      - OVH_ENDPOINT=${OVH_ENDPOINT:-ovh-eu}
       - OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY}
       - OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET}
       - OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY}

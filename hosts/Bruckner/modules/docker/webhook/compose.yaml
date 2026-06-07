@@ -29,7 +29,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.webhook.rule=Host(`webhook.pouic.cc`)"
       - "traefik.http.routers.webhook.entrypoints=websecure"
-      - "traefik.http.routers.webhook.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.webhook.tls=true"
       - "traefik.http.routers.webhook.service=webhook"
       - "traefik.http.services.webhook.loadbalancer.server.port=80"
 
