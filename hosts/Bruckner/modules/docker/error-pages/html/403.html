@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>403 — Access Forbidden</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;1,300&family=DM+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --bg: #0d0808;
+                --bg2: #160a0a;
+                --red-deep: #5c1a1a;
+                --red-mid: #b73434;
+                --red-glow: #e05050;
+                --red-pale: #fdeaea;
+                --amber: #fac775;
+                --cream: #f5efe0;
+                --muted: #8a6060;
+                --scan: rgba(224, 80, 80, 0.04);
+            }
+
+            html,
+            body {
+                height: 100%;
+                background: var(--bg);
+                color: var(--cream);
+                font-family: "DM Mono", monospace;
+                overflow: hidden;
+                cursor: none;
+            }
+
+            /* custom cursor */
+            .cursor {
+                position: fixed;
+                width: 12px;
+                height: 12px;
+                border: 1.5px solid var(--red-glow);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                transform: translate(-50%, -50%);
+                transition:
+                    width 0.15s,
+                    height 0.15s,
+                    background 0.15s;
+                mix-blend-mode: screen;
+            }
+            .cursor.big {
+                width: 32px;
+                height: 32px;
+                background: rgba(224, 80, 80, 0.1);
+            }
+
+            /* scanline overlay */
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                z-index: 3;
+                background: repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 3px,
+                    var(--scan) 3px,
+                    var(--scan) 4px
+                );
+                pointer-events: none;
+                animation: scan-drift 8s linear infinite;
+            }
+            @keyframes scan-drift {
+                from {
+                    background-position-y: 0;
+                }
+                to {
+                    background-position-y: 100vh;
+                }
+            }
+
+            /* grain */
+            body::after {
+                content: "";
+                position: fixed;
+                inset: 0;
+                z-index: 2;
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+                opacity: 0.04;
+                pointer-events: none;
+            }
+
+            /* radial glow behind mascot */
+            .glow-bg {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 520px;
+                height: 520px;
+                background: radial-gradient(
+                    circle,
+                    rgba(180, 40, 40, 0.18) 0%,
+                    transparent 70%
+                );
+                pointer-events: none;
+                z-index: 1;
+                animation: pulse-glow 3s ease-in-out infinite;
+            }
+            @keyframes pulse-glow {
+                0%,
+                100% {
+                    opacity: 0.6;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1.1);
+                }
+            }
+
+            /* ghost 403 */
+            .ghost-403 {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -52%);
+                font-family: "Fraunces", serif;
+                font-size: clamp(180px, 28vw, 340px);
+                font-weight: 700;
+                color: var(--red-mid);
+                opacity: 0.06;
+                letter-spacing: -0.04em;
+                user-select: none;
+                z-index: 1;
+                white-space: nowrap;
+            }
+
+            /* layout */
+            .page {
+                position: relative;
+                z-index: 4;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+                gap: 0;
+            }
+
+            /* warning banner top */
+            .banner {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 36px;
+                background: var(--red-mid);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 18px;
+                font-size: 10px;
+                letter-spacing: 0.2em;
+                color: var(--red-pale);
+                z-index: 10;
+                overflow: hidden;
+            }
+            .banner-text {
+                white-space: nowrap;
+                animation: marquee 18s linear infinite;
+            }
+            @keyframes marquee {
+                from {
+                    transform: translateX(60vw);
+                }
+                to {
+                    transform: translateX(-100%);
+                }
+            }
+            .banner-dot {
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                background: var(--red-pale);
+                border-radius: 50%;
+                animation: blink-dot 1.2s ease-in-out infinite;
+                flex-shrink: 0;
+            }
+            @keyframes blink-dot {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.2;
+                }
+            }
+
+            /* mascot */
+            .mascot-wrap {
+                animation: float 3.4s ease-in-out infinite;
+                filter: drop-shadow(0 0 32px rgba(180, 40, 40, 0.5));
+            }
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-12px);
+                }
+            }
+
+            /* speech bubble */
+            .bubble {
+                position: relative;
+                background: #1e0808;
+                border: 1.5px solid var(--red-mid);
+                border-radius: 18px;
+                padding: 13px 22px;
+                max-width: 300px;
+                text-align: center;
+                font-size: 12.5px;
+                line-height: 1.65;
+                color: var(--red-pale);
+                margin-top: -10px;
+                animation: bubble-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s
+                    both;
+                box-shadow: 0 0 20px rgba(180, 40, 40, 0.25);
+            }
+            .bubble strong {
+                color: var(--amber);
+            }
+            .bubble::before {
+                content: "";
+                position: absolute;
+                top: -14px;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 7px solid transparent;
+                border-bottom-color: var(--red-mid);
+            }
+            .bubble::after {
+                content: "";
+                position: absolute;
+                top: -11px;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 6px solid transparent;
+                border-bottom-color: #1e0808;
+            }
+            @keyframes bubble-in {
+                from {
+                    opacity: 0;
+                    transform: scale(0.7) translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+
+            /* copy */
+            .copy {
+                text-align: center;
+                margin-top: 2.2rem;
+                animation: fade-up 0.7s ease 0.4s both;
+            }
+            .copy h1 {
+                font-family: "Fraunces", serif;
+                font-weight: 300;
+                font-style: italic;
+                font-size: clamp(1.5rem, 3.8vw, 2.4rem);
+                letter-spacing: -0.01em;
+                line-height: 1.15;
+                color: var(--cream);
+                margin-bottom: 0.5rem;
+            }
+            .copy h1 em {
+                font-style: normal;
+                color: var(--red-glow);
+            }
+            .copy p {
+                font-size: 11px;
+                color: var(--muted);
+                letter-spacing: 0.06em;
+            }
+
+            /* terminal log */
+            .terminal {
+                margin-top: 1.8rem;
+                background: #110404;
+                border: 1px solid var(--red-deep);
+                border-radius: 10px;
+                padding: 14px 20px;
+                width: min(340px, 90vw);
+                font-size: 10.5px;
+                line-height: 1.8;
+                color: var(--muted);
+                animation: fade-up 0.7s ease 0.55s both;
+            }
+            .terminal .line {
+                display: flex;
+                gap: 8px;
+            }
+            .terminal .label {
+                color: var(--red-glow);
+                min-width: 60px;
+            }
+            .terminal .val {
+                color: var(--cream);
+            }
+            .terminal .denied {
+                color: var(--red-glow);
+                animation: blink-dot 1.5s infinite;
+            }
+
+            /* cta */
+            .cta-row {
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 1.8rem;
+                animation: fade-up 0.7s ease 0.7s both;
+            }
+            .btn {
+                font-family: "DM Mono", monospace;
+                font-size: 11px;
+                letter-spacing: 0.08em;
+                padding: 10px 24px;
+                border-radius: 50px;
+                cursor: pointer;
+                text-decoration: none;
+                transition:
+                    transform 0.15s ease,
+                    box-shadow 0.15s ease;
+                border: 1.5px solid;
+            }
+            .btn:hover {
+                transform: translateY(-2px);
+            }
+            .btn-primary {
+                background: var(--red-mid);
+                border-color: var(--red-mid);
+                color: var(--red-pale);
+                box-shadow: 0 4px 20px rgba(183, 52, 52, 0.4);
+            }
+            .btn-primary:hover {
+                box-shadow: 0 8px 30px rgba(183, 52, 52, 0.65);
+            }
+            .btn-ghost {
+                background: transparent;
+                border-color: var(--red-deep);
+                color: var(--muted);
+            }
+            .btn-ghost:hover {
+                background: rgba(183, 52, 52, 0.12);
+                border-color: var(--red-mid);
+                color: var(--red-pale);
+            }
+
+            /* error code */
+            .error-code {
+                margin-top: 2rem;
+                font-size: 10px;
+                letter-spacing: 0.15em;
+                color: var(--red-deep);
+                animation: fade-up 0.7s ease 0.9s both;
+            }
+
+            @keyframes fade-up {
+                from {
+                    opacity: 0;
+                    transform: translateY(16px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* SVG mascot animations */
+            .pouic-float {
+                animation: float 3.4s ease-in-out infinite;
+                transform-origin: 200px 180px;
+            }
+            .eye-blink {
+                animation: blink 4.5s ease-in-out infinite;
+            }
+            @keyframes blink {
+                0%,
+                88%,
+                100% {
+                    transform: scaleY(1);
+                }
+                93% {
+                    transform: scaleY(0.05);
+                }
+            }
+            .lock-swing {
+                animation: lock-swing 2s ease-in-out infinite;
+                transform-origin: 200px 148px;
+            }
+            @keyframes lock-swing {
+                0%,
+                100% {
+                    transform: rotate(-8deg);
+                }
+                50% {
+                    transform: rotate(8deg);
+                }
+            }
+            .arm-l-403 {
+                animation: wave 2.6s ease-in-out infinite;
+                transform-origin: 138px 185px;
+            }
+            .arm-r-403 {
+                animation: wave 2.6s ease-in-out infinite reverse;
+                transform-origin: 262px 185px;
+            }
+            @keyframes wave {
+                0%,
+                100% {
+                    transform: rotate(-5deg);
+                }
+                50% {
+                    transform: rotate(5deg);
+                }
+            }
+            .alert-pulse {
+                animation: alert-pulse 1.8s ease-in-out infinite;
+                transform-origin: 200px 110px;
+            }
+            @keyframes alert-pulse {
+                0%,
+                100% {
+                    opacity: 0.7;
+                    transform: scale(1);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scale(1.1);
+                }
+            }
+            .spin-ring {
+                animation: spin-ring 16s linear infinite;
+                transform-origin: 200px 178px;
+            }
+            @keyframes spin-ring {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .twinkle-r1 {
+                animation: tw 3s ease-in-out infinite;
+            }
+            .twinkle-r2 {
+                animation: tw 2.2s ease-in-out infinite 1.1s;
+            }
+            @keyframes tw {
+                0%,
+                100% {
+                    opacity: 0.4;
+                }
+                50% {
+                    opacity: 1;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="cursor" id="cursor"></div>
+        <div class="glow-bg"></div>
+        <div class="ghost-403">403</div>
+
+        <!-- Warning banner -->
+        <div class="banner">
+            <span class="banner-dot"></span>
+            <span class="banner-text"
+                >⚠ ACCESS DENIED &nbsp;·&nbsp; RESTRICTED ZONE &nbsp;·&nbsp;
+                UNAUTHORIZED REQUEST LOGGED &nbsp;·&nbsp; HTTP 403 FORBIDDEN
+                &nbsp;·&nbsp; YOU SHALL NOT PASS &nbsp;·&nbsp; ⚠ ACCESS DENIED
+                &nbsp;·&nbsp; RESTRICTED ZONE</span
+            >
+            <span class="banner-dot"></span>
+        </div>
+
+        <main class="page" style="padding-top: 36px">
+            <!-- Pouic 403 mascot — angry/stern guard version -->
+            <div class="mascot-wrap">
+                <svg
+                    width="320"
+                    viewBox="0 0 400 360"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-label="Pouic in guard mode, blocking access"
+                >
+                    <!-- subtle spin ring in red -->
+                    <g class="spin-ring">
+                        <ellipse
+                            cx="200"
+                            cy="178"
+                            rx="122"
+                            ry="30"
+                            fill="none"
+                            stroke="#B73434"
+                            stroke-width="1.5"
+                            stroke-dasharray="5 6"
+                            opacity="0.35"
+                        />
+                    </g>
+
+                    <!-- warning triangle above head -->
+                    <g class="alert-pulse">
+                        <polygon
+                            points="200,58 222,96 178,96"
+                            fill="#B73434"
+                            opacity="0.9"
+                        />
+                        <text
+                            x="200"
+                            y="90"
+                            font-family="Georgia,serif"
+                            font-size="20"
+                            font-weight="700"
+                            fill="#FDEAEA"
+                            text-anchor="middle"
+                        >
+                            !
+                        </text>
+                    </g>
+
+                    <!-- ghost tail / wisp -->
+                    <path
+                        d="M152 260 Q133 316 150 342 Q163 360 170 342 Q178 362 186 342 Q193 360 200 342 Q207 360 214 342 Q221 360 230 342 Q237 360 248 342 Q256 318 238 260"
+                        fill="#7a1a1a"
+                    />
+
+                    <!-- body shadow -->
+                    <ellipse
+                        cx="200"
+                        cy="306"
+                        rx="64"
+                        ry="12"
+                        fill="#3a0808"
+                        opacity="0.4"
+                    />
+
+                    <!-- body -->
+                    <ellipse cx="200" cy="198" rx="85" ry="80" fill="#7a1a1a" />
+
+                    <!-- guard jacket / chest band -->
+                    <path
+                        d="M158 240 Q200 260 242 240 L238 268 Q200 280 162 268 Z"
+                        fill="#5C1A1A"
+                    />
+                    <rect
+                        x="195"
+                        y="240"
+                        width="10"
+                        height="32"
+                        fill="#B73434"
+                        rx="2"
+                    />
+                    <circle cx="200" cy="242" r="5" fill="#FAC775" />
+
+                    <!-- tummy sheen -->
+                    <ellipse
+                        cx="200"
+                        cy="212"
+                        rx="46"
+                        ry="40"
+                        fill="#a53030"
+                        opacity="0.38"
+                    />
+
+                    <!-- left antenna -->
+                    <line
+                        x1="166"
+                        y1="128"
+                        x2="142"
+                        y2="88"
+                        stroke="#cc4444"
+                        stroke-width="3.5"
+                        stroke-linecap="round"
+                    />
+                    <circle cx="136" cy="80" r="11" fill="#E05050" />
+                    <circle cx="136" cy="80" r="5.5" fill="#FDEAEA" />
+
+                    <!-- right antenna -->
+                    <line
+                        x1="234"
+                        y1="128"
+                        x2="258"
+                        y2="88"
+                        stroke="#cc4444"
+                        stroke-width="3.5"
+                        stroke-linecap="round"
+                    />
+                    <circle cx="264" cy="80" r="11" fill="#E05050" />
+                    <circle cx="264" cy="80" r="5.5" fill="#FDEAEA" />
+
+                    <!-- left arm (blocking / palm-out) -->
+                    <g class="arm-l-403">
+                        <path
+                            d="M138 183 Q115 170 107 188 Q100 204 120 205 Q132 206 140 194"
+                            fill="#7a1a1a"
+                            stroke="#a53030"
+                            stroke-width="1.2"
+                        />
+                        <!-- palm lines -->
+                        <line
+                            x1="110"
+                            y1="192"
+                            x2="119"
+                            y2="188"
+                            stroke="#5C1A1A"
+                            stroke-width="1"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="109"
+                            y1="197"
+                            x2="118"
+                            y2="193"
+                            stroke="#5C1A1A"
+                            stroke-width="1"
+                            stroke-linecap="round"
+                        />
+                    </g>
+
+                    <!-- right arm (raised / stop gesture) -->
+                    <g class="arm-r-403">
+                        <path
+                            d="M262 183 Q285 170 293 188 Q300 204 280 205 Q268 206 260 194"
+                            fill="#7a1a1a"
+                            stroke="#a53030"
+                            stroke-width="1.2"
+                        />
+                        <line
+                            x1="281"
+                            y1="192"
+                            x2="290"
+                            y2="188"
+                            stroke="#5C1A1A"
+                            stroke-width="1"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="282"
+                            y1="197"
+                            x2="291"
+                            y2="193"
+                            stroke="#5C1A1A"
+                            stroke-width="1"
+                            stroke-linecap="round"
+                        />
+                    </g>
+
+                    <!-- left eye white -->
+                    <ellipse cx="178" cy="185" rx="22" ry="21" fill="white" />
+                    <g class="eye-blink" style="transform-origin: 178px 185px">
+                        <ellipse
+                            cx="178"
+                            cy="189"
+                            rx="13"
+                            ry="14"
+                            fill="#2a0808"
+                        />
+                        <circle
+                            cx="184"
+                            cy="182"
+                            r="5"
+                            fill="white"
+                            opacity="0.85"
+                        />
+                    </g>
+
+                    <!-- right eye white -->
+                    <ellipse cx="222" cy="185" rx="22" ry="21" fill="white" />
+                    <g
+                        class="eye-blink"
+                        style="
+                            transform-origin: 222px 185px;
+                            animation-delay: 0.08s;
+                        "
+                    >
+                        <ellipse
+                            cx="222"
+                            cy="189"
+                            rx="13"
+                            ry="14"
+                            fill="#2a0808"
+                        />
+                        <circle
+                            cx="228"
+                            cy="182"
+                            r="5"
+                            fill="white"
+                            opacity="0.85"
+                        />
+                    </g>
+
+                    <!-- ANGRY brows (V shape) -->
+                    <path
+                        d="M160 168 Q178 158 186 165"
+                        fill="none"
+                        stroke="#2a0808"
+                        stroke-width="3.5"
+                        stroke-linecap="round"
+                    />
+                    <path
+                        d="M214 165 Q222 158 240 168"
+                        fill="none"
+                        stroke="#2a0808"
+                        stroke-width="3.5"
+                        stroke-linecap="round"
+                    />
+
+                    <!-- stern mouth (flat/frown) -->
+                    <path
+                        d="M187 220 Q200 214 213 220"
+                        fill="none"
+                        stroke="#2a0808"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                    />
+
+                    <!-- cheek — no blush (stern), replaced by angry marks -->
+                    <line
+                        x1="157"
+                        y1="198"
+                        x2="168"
+                        y2="204"
+                        stroke="#E05050"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        opacity="0.5"
+                    />
+                    <line
+                        x1="157"
+                        y1="206"
+                        x2="168"
+                        y2="200"
+                        stroke="#E05050"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        opacity="0.5"
+                    />
+                    <line
+                        x1="232"
+                        y1="198"
+                        x2="243"
+                        y2="204"
+                        stroke="#E05050"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        opacity="0.5"
+                    />
+                    <line
+                        x1="232"
+                        y1="206"
+                        x2="243"
+                        y2="200"
+                        stroke="#E05050"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        opacity="0.5"
+                    />
+
+                    <!-- padlock hanging from neck -->
+                    <g class="lock-swing">
+                        <!-- chain -->
+                        <line
+                            x1="200"
+                            y1="148"
+                            x2="200"
+                            y2="175"
+                            stroke="#FAC775"
+                            stroke-width="2"
+                            stroke-dasharray="3 2"
+                        />
+                        <!-- lock body -->
+                        <rect
+                            x="188"
+                            y="175"
+                            width="24"
+                            height="20"
+                            rx="4"
+                            fill="#FAC775"
+                        />
+                        <!-- lock shackle -->
+                        <path
+                            d="M192 175 Q192 164 200 164 Q208 164 208 175"
+                            fill="none"
+                            stroke="#FAC775"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                        />
+                        <!-- keyhole -->
+                        <circle cx="200" cy="182" r="3.5" fill="#5C1A1A" />
+                        <rect
+                            x="198.5"
+                            y="183"
+                            width="3"
+                            height="6"
+                            rx="1"
+                            fill="#5C1A1A"
+                        />
+                    </g>
+
+                    <!-- name badge -->
+                    <rect
+                        x="168"
+                        y="302"
+                        width="64"
+                        height="24"
+                        rx="12"
+                        fill="#5C1A1A"
+                        stroke="#B73434"
+                        stroke-width="1.2"
+                    />
+                    <text
+                        x="200"
+                        y="319"
+                        font-family="Georgia,serif"
+                        font-size="11"
+                        font-weight="700"
+                        fill="#FDEAEA"
+                        text-anchor="middle"
+                        letter-spacing="2"
+                    >
+                        POUIC
+                    </text>
+
+                    <!-- small warning sparks -->
+                    <g class="twinkle-r1">
+                        <line
+                            x1="115"
+                            y1="140"
+                            x2="120"
+                            y2="130"
+                            stroke="#E05050"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="110"
+                            y1="133"
+                            x2="120"
+                            y2="135"
+                            stroke="#E05050"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="112"
+                            y1="145"
+                            x2="122"
+                            y2="140"
+                            stroke="#E05050"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                    </g>
+                    <g class="twinkle-r2">
+                        <line
+                            x1="280"
+                            y1="132"
+                            x2="285"
+                            y2="122"
+                            stroke="#FAC775"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="275"
+                            y1="125"
+                            x2="285"
+                            y2="127"
+                            stroke="#FAC775"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="277"
+                            y1="137"
+                            x2="287"
+                            y2="132"
+                            stroke="#FAC775"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Speech bubble -->
+            <div class="bubble">
+                <strong>Halt!</strong> You don't have permission<br />to enter
+                this area, friend.
+            </div>
+
+            <!-- Copy -->
+            <div class="copy">
+                <h1>You are <em>not allowed</em><br />beyond this point.</h1>
+                <p>error 403 &nbsp;·&nbsp; forbidden access</p>
+            </div>
+
+            <!-- Terminal log -->
+            <div class="terminal">
+                <div class="line">
+                    <span class="label">STATUS</span
+                    ><span class="val denied">403 FORBIDDEN</span>
+                </div>
+                <div class="line">
+                    <span class="label">REASON</span
+                    ><span class="val">insufficient privileges</span>
+                </div>
+                <div class="line">
+                    <span class="label">ACTION</span
+                    ><span class="val">request blocked</span>
+                </div>
+                <div class="line">
+                    <span class="label">GUARD</span
+                    ><span class="val">Pouic is watching 👁</span>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-row">
+                <a href="/" class="btn btn-primary">← go home</a>
+                <a href="javascript:history.back()" class="btn btn-ghost"
+                    >go back</a
+                >
+            </div>
+
+            <p class="error-code">
+                HTTP_403 &nbsp;·&nbsp; ACCESS_FORBIDDEN &nbsp;·&nbsp;
+                REQUEST_BLOCKED
+            </p>
+        </main>
+
+        <script>
+            // custom cursor
+            const cursor = document.getElementById("cursor");
+            document.addEventListener("mousemove", (e) => {
+                cursor.style.left = e.clientX + "px";
+                cursor.style.top = e.clientY + "px";
+            });
+            document.querySelectorAll("a,.mascot-wrap").forEach((el) => {
+                el.addEventListener("mouseenter", () =>
+                    cursor.classList.add("big"),
+                );
+                el.addEventListener("mouseleave", () =>
+                    cursor.classList.remove("big"),
+                );
+            });
+
+            // glitch effect on the ghost 403 text
+            const ghost = document.querySelector(".ghost-403");
+            if (!ghost) {
+                const g = document.createElement("div");
+                g.className = "ghost-403";
+                g.textContent = "403";
+                document.body.appendChild(g);
+            }
+
+            // click Pouic easter egg
+            const mascot = document.querySelector(".mascot-wrap");
+            const bubble = document.querySelector(".bubble");
+            const msgs = [
+                "I said NO. 🚫",
+                "My padlock is unbreakable.",
+                "Try again… actually don't.",
+                "Error 403: Pouic said so.",
+                "You really thought that would work?",
+            ];
+            let idx = 0;
+            mascot.addEventListener("click", () => {
+                bubble.innerHTML = `<strong>Halt!</strong> ${msgs[idx++ % msgs.length]}`;
+            });
+
+            // terminal typing effect
+            const terminal = document.querySelector(".terminal");
+            const lines = terminal.querySelectorAll(".val");
+            lines.forEach((line, i) => {
+                const text = line.textContent;
+                line.textContent = "";
+                let j = 0;
+                setTimeout(
+                    () => {
+                        const iv = setInterval(() => {
+                            line.textContent += text[j++];
+                            if (j >= text.length) clearInterval(iv);
+                        }, 35);
+                    },
+                    800 + i * 320,
+                );
+            });
+        </script>
+    </body>
+</html>

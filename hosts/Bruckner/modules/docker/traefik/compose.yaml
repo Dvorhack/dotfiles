@@ -1,0 +1,54 @@
+services:
+  traefik:
+    image: traefik:v3.7
+    container_name: traefik
+    command:
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network=traefik-net"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--log.level=INFO"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls.certresolver=letsencrypt"
+      - "--entrypoints.websecure.http.tls.domains[0].main=pouic.cc"
+      - "--entrypoints.websecure.http.tls.domains[0].sans=*.pouic.cc"
+      - "--certificatesresolvers.letsencrypt.acme.email=paul@serviel.fr"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=ovh"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-letsencrypt:/letsencrypt
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+
+      # enable dashboardon lan only
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.pouic.cc`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=error-handler@docker,vpn-only@docker"
+      - "traefik.http.middlewares.vpn-only.ipallowlist.sourcerange=10.0.0.0/24"
+
+    environment:
+      - OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY}
+      - OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET}
+      - OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY}
+      - LEGO_DISABLE_CNAME_SUPPORT=true
+
+volumes:
+  traefik-letsencrypt:
+
+networks:
+  traefik-net:
+    external: true

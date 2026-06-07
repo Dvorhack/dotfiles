@@ -15,6 +15,7 @@ in
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     inputs.home-manager.nixosModules.home-manager
+    modules/server-components.nix
   ];
 
   nix.settings.experimental-features = [
@@ -53,6 +54,7 @@ in
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
     pkgs.gitMinimal
+    pkgs.htop
   ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -103,75 +105,12 @@ in
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
-  services.nginx = {
-    enable = true;
-    virtualHosts."error-pages" = {
-      listen = [ { addr = "127.0.0.1"; port = 8404; } ];
-      extraConfig = ''
-        root ${pkgs.writeTextDir "404.html" (builtins.readFile ./www/404.html)};
-        error_page 404 /404.html;
-        location / { return 404; }
-        location = /404.html { internal; }
-      '';
-    };
-  };
+
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 22 80 443 ];
-  networking.firewall.allowedUDPPorts = [ 51820 ];
-
-  sops.secrets."traefik-ovh-env" = {
-    sopsFile = ./secrets/traefik.yaml;
-    restartUnits = [ "traefik.service" ];
-  };
-
-  services.traefik = {
-    enable = true;
-    environmentFiles = [ config.sops.secrets."traefik-ovh-env".path ];
-    staticConfigOptions = {
-      entryPoints = {
-        web = {
-          address = ":80";
-          http.redirections.entryPoint = {
-            to = "websecure";
-            scheme = "https";
-          };
-        };
-        websecure.address = ":443";
-      };
-      api.dashboard = true;
-      certificatesResolvers.letsencrypt.acme = {
-        email = "paul@serviel.fr";
-        storage = "/var/lib/traefik/acme.json";
-        dnsChallenge = {
-          provider = "ovh";
-          resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
-        };
-      };
-    };
-    dynamicConfigOptions = {
-      http = {
-        routers.traefik-dashboard = {
-          rule = "Host(`traefik.pouic.cc`)";
-          entryPoints = [ "websecure" ];
-          service = "api@internal";
-          tls.certResolver = "letsencrypt";
-          middlewares = [ "vpn-only" ];
-        };
-        middlewares.vpn-only.ipAllowList.sourceRange = [ "10.0.0.0/24" ];
-        routers.default = {
-          rule = "PathPrefix(`/`)";
-          entryPoints = [ "websecure" ];
-          service = "default-404";
-          priority = 1;
-          tls = {};
-        };
-        services.default-404.loadBalancer.servers = [
-          { url = "http://127.0.0.1:8404"; }
-        ];
-      };
-    };
-  };
+  networking.firewall.allowedTCPPorts = [ 22 80 443 3478 5349 ];
+  networking.firewall.allowedUDPPorts = [ 51820 3478 5349 ];
+  networking.firewall.allowedUDPPortRanges = [ { from = 49152; to = 65535; } ];
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
@@ -185,7 +124,6 @@ in
     owner = "user"; # or whatever your username is
   };
 
-  # Enable Docker
   virtualisation.docker = {
     enable = true;
     autoPrune.enable = true;

@@ -8,6 +8,11 @@ creation_rules:
       - age:
           - *strauss
           - *bruckner
+  - path_regex: hosts/Bruckner/modules/docker/[^/]+/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *strauss
+          - *bruckner
   - path: wireguard/keys.yaml
     key_groups:
       - age:
