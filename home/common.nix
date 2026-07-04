@@ -18,6 +18,8 @@
     sops
     git
     age
+    netcat-gnu
+    wireguard-tools
   ];
 
   home.sessionPath = [
