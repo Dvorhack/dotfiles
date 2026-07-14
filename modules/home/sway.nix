@@ -96,6 +96,17 @@
       startup = [
         { command = "swaync"; }
       ];
+
+      workspaceOutputAssign = [
+        {
+          workspace = "1";
+          output = "DP-1";
+        }
+        {
+          workspace = "10";
+          output = "eDP-1";
+        }
+      ];
     };
 
     extraConfig = ''
