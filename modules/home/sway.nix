@@ -17,7 +17,7 @@
       + ":"
       + "/etc/profiles/per-user/$USER/share"
       + ":"
-      + builtins.getEnv "XDG_DATA_DIRS"
+      + "/usr/local/share:/usr/share"
     );
   };
 
